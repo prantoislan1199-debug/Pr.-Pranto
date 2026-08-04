@@ -1,0 +1,6 @@
+{
+  "name": "PR. Pranto",
+  "description": "An premium, elegant short-video social platform featuring high-fidelity creator tools, a stylized video feed, interactive comments, and a powerful admin control center.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
