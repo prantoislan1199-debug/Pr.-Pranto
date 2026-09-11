@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PK Pranto - Short Video App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Custom vertical scroll snapping for video feed */
+    .video-container {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      height: 100vh;
+      scrollbar-width: none; /* Firefox */
+    }
+    .video-container::-webkit-scrollbar {
+      display: none; /* Chrome/Safari */
+    }
+    .video-card {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body class="bg-black text-white font-sans select-none overflow-hidden">
+
+  <!-- Top Navigation Header -->
+  <header class="fixed top-0 left-0 right-0 z-30 flex justify-between items-center px-4 py-3 bg-gradient-to-b from-black/80 to-transparent">
+    <div class="flex items-center space-x-2">
+      <!-- PK Logo Monogram -->
+      <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 flex items-center justify-center font-black text-black text-xl shadow-lg border-2 border-amber-300">
+        PK
+      </div>
+      <span class="font-extrabold text-xl tracking-wide text-amber-400 drop-shadow">PK Pranto</span>
+    </div>
+    
+    <button onclick="openPaymentModal()" class="flex items-center space-x-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-4 py-1.5 rounded-full font-bold text-sm shadow-md hover:scale-105 transition-transform active:scale-95">
+      <i class="fa-solid font-bold fa-crown"></i>
+      <span>Get Pro</span>
+    </button>
+  </header>
+
+  <!-- Main Video Feed Area -->
+  <main id="feedContainer" class="video-container relative w-full">
+    <!-- Videos dynamically injected by JavaScript -->
+  </main>
+
+  <!-- Subscription / Payment Modal -->
+  <div id="paymentModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-end sm:items-center justify-center transition-opacity">
+    <div class="bg-neutral-900 border border-neutral-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      
+      <!-- Close Button -->
+      <button onclick="closePaymentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+
+      <!-- Header -->
+      <div class="text-center mb-5">
+        <div class="inline-block p-3 bg-amber-500/10 rounded-full text-amber-400 mb-2">
+          <i class="fa-solid fa-crown text-3xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-white">PK Pranto Pro (Ad-Free)</h2>
+        <p class="text-xs text-gray-400 mt-1">বিজ্ঞাপন ছাড়া নিরবচ্ছিন্ন ভিডিও দেখুন</p>
+      </div>
+
+      <!-- Packages -->
+      <div class="space-y-3 mb-6">
+        <label class="block cursor-pointer">
+          <input type="radio" name="package" value="50" data-days="7" checked class="peer hidden">
+          <div class="flex items-center justify-between p-3.5 rounded-xl border border-neutral-700 bg-neutral-800 peer-checked:border-amber-400 peer-checked:bg-amber-400/10 transition">
+            <div>
+              <div class="font-bold text-sm text-white">৭ দিনের প্ল্যান</div>
+              <div class="text-xs text-gray-400">৭ দিন সম্পুর্ণ বিজ্ঞাপন মুক্ত</div>
+            </div>
+            <div class="text-amber-400 font-extrabold text-lg">৳ ৫০</div>
+          </div>
+        </label>
+
+        <label class="block cursor-pointer">
+          <input type="radio" name="package" value="150" data-days="15" class="peer hidden">
+          <div class="flex items-center justify-between p-3.5 rounded-xl border border-neutral-700 bg-neutral-800 peer-checked:border-amber-400 peer-checked:bg-amber-400/10 transition">
+            <div>
+              <div class="font-bold text-sm text-white">১৫ দিনের প্ল্যান</div>
+              <div class="text-xs text-gray-400">১৫ দিন সম্পুর্ণ বিজ্ঞাপন মুক্ত</div>
+            </div>
+            <div class="text-amber-400 font-extrabold text-lg">৳ ১৫০</div>
+          </div>
+        </label>
+
+        <label class="block cursor-pointer">
+          <input type="radio" name="package" value="200" data-days="30" class="peer hidden">
+          <div class="flex items-center justify-between p-3.5 rounded-xl border border-neutral-700 bg-neutral-800 peer-checked:border-amber-400 peer-checked:bg-amber-400/10 transition relative overflow-hidden">
+            <span class="absolute top-0 right-0 bg-amber-500 text-black text-[10px] font-black px-2 py-0.5 rounded-bl">POPULAR</span>
+            <div>
+              <div class="font-bold text-sm text-white">৩০ দিনের প্ল্যান</div>
+              <div class="text-xs text-gray-400">৩০ দিন সম্পুর্ণ বিজ্ঞাপন মুক্ত</div>
+            </div>
+            <div class="text-amber-400 font-extrabold text-lg">৳ ২০০</div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Payment Gateway Details -->
+      <div class="bg-neutral-800/80 p-4 rounded-xl border border-neutral-700/60 mb-5">
+        <p class="text-xs font-semibold text-gray-300 mb-2">টাকা পাঠানোর নম্বর (Send Money):</p>
+        <div class="flex items-center justify-between bg-black/60 px-3 py-2 rounded-lg border border-neutral-700">
+          <div class="flex items-center space-x-2">
+            <span class="text-xs bg-pink-600 text-white px-1.5 py-0.5 rounded font-bold">bKash</span>
+            <span class="text-xs bg-orange-600 text-white px-1.5 py-0.5 rounded font-bold">Nagad</span>
+            <span class="text-xs bg-purple-600 text-white px-1.5 py-0.5 rounded font-bold">Rocket</span>
+            <span id="paymentNum" class="font-mono font-bold text-amber-400 text-sm">01738651481</span>
+          </div>
+          <button onclick="copyNumber()" class="text-xs bg-neutral-700 hover:bg-neutral-600 text-white px-2 py-1 rounded transition flex items-center space-x-1">
+            <i class="fa-regular fa-copy"></i>
+            <span>Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Submission Form -->
+      <form onsubmit="handlePaymentSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-400 mb-1">আপনার ফোন নম্বর</label>
+          <input type="tel" id="senderPhone" required placeholder="017XXXXXXXX" class="w-full bg-black/50 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-400 mb-1">ট্রানজেকশন আইডি (TrxID)</label>
+          <input type="text" id="trxId" required placeholder="8N7A6D..." class="w-full bg-black/50 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400">
+        </div>
+        <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-bold py-3 rounded-xl mt-2 shadow-lg hover:opacity-95 transition">
+          পেমেন্ট ভেরিফাই করুন
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Alert -->
+  <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-black font-semibold text-xs px-4 py-2.5 rounded-full shadow-2xl hidden transition-all">
+    নম্বর কপি করা হয়েছে!
+  </div>
+
+  <script>
+    // Sample TikTok style public test videos
+    const videoData = [
+      {
+        id: 1,
+        url: 'https://assets.mixkit.co/videos/preview/mixkit-vertical-video-of-a-woman-running-along-the-beach-41006-large.mp4',
+        user: '@pranto_official',
+        desc: 'Beautiful morning beach run 🌅 #PKPranto #Viral',
+        likes: '12.4K',
+        comments: '450'
+      },
+      {
+        id: 2,
+        url: 'https://assets.mixkit.co/videos/preview/mixkit-vertical-shot-of-a-skater-performing-tricks-41484-large.mp4',
+        user: '@skate_master',
+        desc: 'Night vibes and skateboarding tricks 🔥',
+        likes: '45.1K',
+        comments: '1.2K'
+      },
+      {
+        id: 3,
+        url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-lights-1232-large.mp4',
+        user: '@neon_vibes',
+        desc: 'Cyberpunk neon light show ✨ #shorts',
+        likes: '8.9K',
+        comments: '210'
+      }
+    ];
+
+    let isProUser = false;
+    let videoCounter = 0;
+
+    // Render Videos into Container
+    const container = document.getElementById('feedContainer');
+
+    function renderFeed() {
+      container.innerHTML = '';
+      videoData.forEach((video, index) => {
+        // Video Slide
+        const card = document.createElement('div');
+        card.className = 'video-card relative w-full bg-neutral-900 flex items-center justify-center';
+        
+        card.innerHTML = `
+          <video loop playsinline onclick="togglePlay(this)" class="w-full h-full object-cover">
+            <source src="${video.url}" type="video/mp4">
+          </video>
+          
+          <!-- Gradient Overlay -->
+          <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 pointer-events-none"></div>
+
+          <!-- Interaction Buttons (Right Sidebar) -->
+          <div class="absolute right-4 bottom-20 flex flex-col items-center space-y-5 z-20">
+            <button onclick="toggleLike(this)" class="flex flex-col items-center group">
+              <div class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white group-hover:text-red-500 transition">
+                <i class="fa-solid fa-heart text-2xl"></i>
+              </div>
+              <span class="text-xs font-semibold mt-1">${video.likes}</span>
+            </button>
+            <button class="flex flex-col items-center">
+              <div class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white">
+                <i class="fa-solid fa-comment text-2xl"></i>
+              </div>
+              <span class="text-xs font-semibold mt-1">${video.comments}</span>
+            </button>
+            <button onclick="shareApp()" class="flex flex-col items-center">
+              <div class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white">
+                <i class="fa-solid fa-share text-2xl"></i>
+              </div>
+              <span class="text-xs font-semibold mt-1">Share</span>
+            </button>
+          </div>
+
+          <!-- Caption Details -->
+          <div class="absolute left-4 bottom-8 z-20 max-w-[75%] space-y-2">
+            <h3 class="font-bold text-base text-amber-400 drop-shadow">${video.user}</h3>
+            <p class="text-xs text-gray-200 line-clamp-2">${video.desc}</p>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      // Insert Interstitial Ad Card for free users after index 2
+      const adCard = document.createElement('div');
+      adCard.id = 'adCard';
+      adCard.className = `video-card relative w-full bg-neutral-950 flex flex-col items-center justify-center p-6 text-center ${isProUser ? 'hidden' : ''}`;
+      adCard.innerHTML = `
+        <div class="w-20 h-20 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-4xl mb-4 animate-bounce">
+          <i class="fa-solid fa-rectangle-ad"></i>
+        </div>
+        <span class="bg-amber-500 text-black text-[10px] font-black px-2 py-0.5 rounded mb-2">SPONSORED AD</span>
+        <h3 class="text-xl font-bold text-white mb-1">বিজ্ঞাপন এড়িয়ে ভিডিও দেখতে চান?</h3>
+        <p class="text-xs text-gray-400 max-w-xs mb-6">PK Pranto Pro সাবস্ক্রাইব করুন এবং একদম বিজ্ঞাপন ছাড়া ভিডিও উপভোগ করুন।</p>
+        <button onclick="openPaymentModal()" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-bold px-6 py-3 rounded-full shadow-lg">
+          মাত্র ৳৫০ থেকে শুরু করুন
+        </button>
+      `;
+      container.appendChild(adCard);
+    }
+
+    renderFeed();
+
+    // Intersection Observer to Auto Play/Pause Videos
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target.querySelector('video');
+        if (video) {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        }
+      });
+    }, { threshold: 0.6 });
+
+    document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
+
+    // Play/Pause Click Handler
+    function togglePlay(video) {
+      if (video.paused) {
+        video.play();
+      } else {
+        video.pause();
+      }
+    }
+
+    // Like Animation Handler
+    function toggleLike(btn) {
+      const icon = btn.querySelector('i');
+      icon.classList.toggle('text-red-500');
+    }
+
+    // Modal Control Functions
+    function openPaymentModal() {
+      document.getElementById('paymentModal').classList.remove('hidden');
+    }
+
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.add('hidden');
+    }
+
+    // Clipboard Copy Handler
+    function copyNumber() {
+      const num = document.getElementById('paymentNum').innerText;
+      navigator.clipboard.writeText(num);
+      showToast('নম্বর কপি করা হয়েছে!');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 2500);
+    }
+
+    // Handle Payment Submission
+    function handlePaymentSubmit(e) {
+      e.preventDefault();
+      const phone = document.getElementById('senderPhone').value;
+      const trx = document.getElementById('trxId').value;
+
+      showToast('পেমেন্ট রিকোয়েস্ট পাঠানো হয়েছে!');
+      closePaymentModal();
+
+      // Simulate admin approval / activation
+      setTimeout(() => {
+        isProUser = true;
+        const ad = document.getElementById('adCard');
+        if(ad) ad.classList.add('hidden');
+        showToast('অভিনন্দন! PK Pranto Pro অ্যাক্টিভ হয়েছে।');
+      }, 1500);
+    }
+
+    function shareApp() {
+      showToast('লিংক কপি করা হয়েছে!');
+    }
+  </script>
+</body>
+</html>
